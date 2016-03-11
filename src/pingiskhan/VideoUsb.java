@@ -16,30 +16,64 @@ import org.opencv.highgui.Highgui;
 import org.opencv.highgui.VideoCapture;
 import org.opencv.imgproc.Imgproc;
 
-import lejos.hardware.Button;
-import lejos.utility.Delay;
 
-public class VideoUsb extends Thread{
+/**
+ * Captures video, manipulates it to find orange color and sends command in
+ * thread
+ *
+ * @author eetz1, willy, m2ko
+ * @version 1.0
+ */
+
+public class VideoUsb extends Thread {
 
 	private Storage stor;
 	private VideoCapture vid;
 	private CmdMotors cmdM;
+
+	/**
+	 * These are final width and height of captured video
+	 */
 	private final int width = 100, height = 80;
 	private Mat dilate;
 	private Mat erode;
+
+	/**
+	 * Scalar to find orange color
+	 */
 	private final Scalar hsvMin = new Scalar(0, 218, 148, 0);// orange
 	private final Scalar hsvMax = new Scalar(32, 255, 255, 0);// orange
 	// private final Scalar hsvMin = new Scalar(0, 50, 50, 0);// red
 	// private final Scalar hsvMax = new Scalar(6, 255, 255, 0);// red
 	// private final Scalar hsvMin2 = new Scalar(165, 50, 50, 0);// red
 	// private final Scalar hsvMax2 = new Scalar(180, 255, 255, 0);// red
+	/**
+	 * mBlur blurs image, moveRange is middle picture range, yHit is range where
+	 * robot won't hit the ball
+	 */
 	private final int mBlur = 5, moveRange = 10, radiusHit = 40, yHit = 65;
+
+	/**
+	 * Recognized ball has to be bigger than maxArea
+	 */
 	private final double maxArea = 50;
 
+	/**
+	 * Distances of ball to middle of picture
+	 */
 	int rightdistance, leftdistance, x, y;
-private boolean terminated = false;
+	/**
+	 *Thread terminated?
+	 */
+	private boolean terminated = false;
 	private Mat matImg, matImg2, sourceImg, hie;
 
+	/**
+	 * Constructor of Video, loads Core.NATIVE_LIB, creates CmdMotors object
+	 *
+	 * @param stor Storage is to set and get commands
+	 * @param motors Motors are motors of robot
+	 */
 	public VideoUsb(Storage stor, Motors motors) {
 
 		System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
@@ -49,40 +83,53 @@ private boolean terminated = false;
 		cmdM = new CmdMotors(stor, motors);
 	}
 
+	/* (non-Javadoc)
+	 * @see java.lang.Thread#run()
+	 */
 	public void run() {
-		terminated=false;
+		terminated = false;
 		sourceImg = new Mat();
 		vid = new VideoCapture(0);
 		vid.set(Highgui.CV_CAP_PROP_FRAME_WIDTH, width);
 		vid.set(Highgui.CV_CAP_PROP_FRAME_HEIGHT, height);
 		vid.open(0);
 		System.out.println("Camera open");
-		while(!terminated){
+		while (!terminated) {
 			manipulateImg();
 		}
 
 	}
 
+	/**
+	 * Starts CmdMotors thread
+	 */
 	public void startCmd() {
 		cmdM.start();
 	}
 
+	/**
+	 * Reads video and creates mat of that one video frame
+	 *
+	 * @return returns Mat of captured picture
+	 */
 	public Mat videoCap() {
 		vid.read(sourceImg);
-		//System.out.println("jeereturn");
-
 		return sourceImg;
 	}
 
-
+	/**
+	 * Terminates this thread and CmdMotors thread
+	 */
 	public void terminate() {
 		cmdM.terminate();
 		terminated = true;
 	}
 
-	public void manipulateImg(/*Mat sourceImg*/) {
+	/**
+	 * Method that manipulates captured Mat, recognizes ball and sets commands for CmdMotors.
+	 */
+	public void manipulateImg(/* Mat sourceImg */) {
 		sourceImg = videoCap();
-		//System.out.println("jeemani");
 
 		Imgproc.cvtColor(sourceImg, sourceImg, Imgproc.COLOR_BGR2HSV);
 		matImg = new Mat();
@@ -140,13 +187,11 @@ private boolean terminated = false;
 					// {
 					// stor.setCmd(4);//HIT
 					// stor.setCmd(3);
-				}
-				else if (x + moveRange < (matImg2.width() / 2)) {
+				} else if (x + moveRange < (matImg2.width() / 2)) {
 					stor.setCmd(1);// back
 					stor.setDist(rightdistance);
 
-				}
-				else if ((x - moveRange > (matImg2.width() / 2))) {
+				} else if ((x - moveRange > (matImg2.width() / 2))) {
 					stor.setCmd(2); // for
 					stor.setDist(leftdistance);
 
