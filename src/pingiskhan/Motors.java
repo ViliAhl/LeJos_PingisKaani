@@ -6,12 +6,21 @@ import lejos.hardware.port.MotorPort;
 import lejos.robotics.RegulatedMotor;
 import lejos.utility.Delay;
 
+/**
+* All the motor methods are here.
+*
+* @author M2ko, eetz1, willy
+* @version 1.0
+*/
 public class Motors {
 
 	RegulatedMotor leftm;
 	RegulatedMotor rightm;
 	private RegulatedMotor hit;
 
+	/**
+	 * Creates the motor objects and sets the speed to max and synchronizes them.
+	 */
 	public Motors() {
 		leftm = new EV3LargeRegulatedMotor(MotorPort.B);
 		rightm = new EV3LargeRegulatedMotor(MotorPort.C);
@@ -22,7 +31,11 @@ public class Motors {
 		leftm.synchronizeWith(new RegulatedMotor[] { rightm });
 		System.out.println("motorsrdy");
 	}
-
+	/**
+	* Motors go forward.
+	*
+	* @param delay delays the motors depending on the distance of the ball.
+	*/
 	public void forward(int delay) {
 		leftm.startSynchronization();
 		leftm.forward();
@@ -31,7 +44,11 @@ public class Motors {
 		Delay.msDelay(delay);
 
 	}
-
+	/**
+	* Motors go backward.
+	*
+	* @param delay delays the motors depending on the distance of the ball.
+	*/
 	public void backward(int delay) {
 		leftm.startSynchronization();
 		leftm.backward();
@@ -39,21 +56,18 @@ public class Motors {
 		leftm.endSynchronization();
 		Delay.msDelay(delay);
 	}
-
-	/*
-	 * public void turn() { int x = (int)(Math.random() * 3000 + 1000);
-	 * //leftm.startSynchronization(); if (x<=1500) { leftm.forward();
-	 * rightm.backward(); Delay.msDelay(x); stop(); }else{ leftm.backward();
-	 * rightm.forward(); Delay.msDelay(x); stop(); } //
-	 * leftm.endSynchronization();
-	 *
-	 * }
-	 */
+	/**
+	* Rotates the motor that controls the hit mechanism.
+	*
+	*/
 	public void hit() {
 		hit.rotate(-35);
 		hit.rotate(35);
 	}
-
+	/**
+	* Stops the motors.
+	*
+	*/
 	public void stop() {
 		leftm.startSynchronization();
 		leftm.stop();

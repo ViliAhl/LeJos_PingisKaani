@@ -7,6 +7,12 @@ import lejos.hardware.Button;
 import lejos.robotics.subsumption.Arbitrator;
 import lejos.robotics.subsumption.Behavior;
 
+/**
+* Main loop.
+*
+* @author M2ko, eetz1, Willy
+* @version 1.0
+*/
 public class Main2 {
 
 	public static void main(String[] args) {
