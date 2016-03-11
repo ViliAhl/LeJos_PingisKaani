@@ -1,18 +1,33 @@
 package pingiskhan;
 
 public class Storage {
+	/**
+	 * Command and Dist stores the command as in which direction to go and distance to see how far the ball is.
+	 */
 	volatile int command,dist;
+
+	/**
+	 * Sees if theres a thread writing or reading command or distance.
+	 */
 	volatile boolean readgoingon = false, writegoingon= true;
 
 
-	  public Storage()
+	  /**
+	 * Constructor sets dist and command to 0.
+	 */
+	public Storage()
 	  {
 		  dist=0;
 		  command = 0; // 0 edustaa tyhj�� s�ili�t�
 	  }
 
 
-	 public synchronized int getCmd() throws InterruptedException{
+	 /**
+	  * Getter for the command.
+	 * @return Returns the value of command
+	 * @throws InterruptedException
+	 */
+	public synchronized int getCmd() throws InterruptedException{
 	    	while (command==0){
 	     		wait();
 	    	}
@@ -23,7 +38,12 @@ public class Storage {
 		    	//notifyAll();
 		    	return returnCmd;
 	  }
-	  public synchronized int getDist() throws InterruptedException{
+	  /**
+	 * Getter for the distance.
+	 * @return Returns the value of distance.
+	 * @throws InterruptedException
+	 */
+	public synchronized int getDist() throws InterruptedException{
 	    	while (dist==0){
 	     		wait();
 	    	}
@@ -31,43 +51,28 @@ public class Storage {
 	    	int returnDist = dist;
 		    	dist = 0;
 
-		    	//notifyAll();
 		    	return returnDist;
 	  }
 
-	  public synchronized void setCmd(int n) throws InterruptedException{
-//
-//		   	while (!(command==0)){
-//		   		wait();
-//		   	}
+	  /**
+	   * Setter for the command.
+	 * @param n is the value to be set as the command.
+	 * @throws InterruptedException
+	 */
+	public synchronized void setCmd(int n) throws InterruptedException{
 		   	command = n;
 		   	notifyAll();
 	  }
-	  public synchronized void setDist(int n) throws InterruptedException{
+	  /**
+	   * Setter for the distance.
+	 * @param n is the value to be set as the distance.
+	 * @throws InterruptedException
+	 */
+	public synchronized void setDist(int n) throws InterruptedException{
 
-//		   	while (!(dist==0)){
-//		   		wait();
-//		   	}
 		   	dist = n;
 		   	notifyAll();
 	  }
-//public void setCmd2(int n) throws InterruptedException{
-//	while(readgoingon){}
-//		writegoingon=true;
-//	System.out.println("setcmd2  "+n);
-//	command=n;
-//	writegoingon=false;
-//}
-//
-//	public  int getCmd2() throws InterruptedException{
-//	while(writegoingon){
-//		}
-//	readgoingon=true;
-//	System.out.println("getcmd2  "+command);
-//	int c = command;
-//	readgoingon=false;
-//	return c;
-//}
 }
 
 

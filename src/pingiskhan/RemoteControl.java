@@ -5,30 +5,51 @@ import java.io.IOException;
 import java.net.Socket;
 
 import lejos.robotics.subsumption.Behavior;
-
+/**
+* Remote control behavior. Controlled from a computer JavaFX application.
+*
+* @author M2ko, eetz1, Willy
+* @version 1.0
+*/
 public class RemoteControl implements Behavior {
-
+	/**
+	* Suppresses the behavior if command comes from the computer.
+	*/
 	private volatile boolean suppressed = false;;
 
 	private Sockett soc;
 	private Socket s;
 	private DataInputStream dataIn;
 	private Motors motors;
-
+	/**
+	* These are used to see if theres any data in the InputStream.
+	*/
 	private int data, length;
 
+	/**
+	 * Constructor
+	 * @param motors Motors of the robot.
+	 * @param soc Socket thread that waits for the connection from the computer.
+	 * @throws IOException Throws IOException.
+	 */
 	public RemoteControl(Motors motors, Sockett soc) throws IOException {
 		this.soc = soc;
-		// this.s = s;
 		s = new Socket();
 		this.motors = motors;
 	}
-
+	/**
+	* Takes control of the behavior.
+	*
+	* @return If return is true this behavior will start.
+	*/
 	@Override
 	public boolean takeControl() {
 		return soc.getControl();
 	}
-
+	/**
+	* The main method of the behavior. Behavior will run this until it ends.
+	*
+	*/
 	@Override
 	public void action() {
 
@@ -65,7 +86,6 @@ public class RemoteControl implements Behavior {
 					break;
 				}
 					data=0;
-					//motors.stop();
 
 				}
 			} catch (IOException e) {
@@ -74,7 +94,10 @@ public class RemoteControl implements Behavior {
 			}
 		}
 	}
-
+	/**
+	* Changes suppressed = true, which ends the behavior.
+	*
+	*/
 	@Override
 	public void suppress() {
 		suppressed = true;

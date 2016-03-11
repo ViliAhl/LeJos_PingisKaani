@@ -8,67 +8,56 @@ import lejos.hardware.motor.EV3MediumRegulatedMotor;
 import lejos.hardware.port.MotorPort;
 import lejos.robotics.RegulatedMotor;
 import lejos.utility.Delay;
+/**
+* Gives commands to motors in a thread while the automated detection behavior is running.
+*
+* @author M2ko, eetz1, Willy
+* @version 1.0
+*/
 
 public class CmdMotors extends Thread {
 	private int cmd;
 	private Storage stor;
 	private Motors motors;
+	/**
+	* Thread ends when done is changed to true in terminate() method.
+	*/
 	private boolean done = false;
 	private RegulatedMotor leftm;
 	private RegulatedMotor rightm;
 	private RegulatedMotor hit;
 
+	/**
+	 * Constructor
+	 * @param stor Storage is to set and get motor commands and distances.
+	 * @param motors Motors are motors of the robot.
+	 */
 	public CmdMotors(Storage stor,Motors motors) {
 		this.stor = stor;
-		/*
-		 * leftm = new EV3LargeRegulatedMotor(MotorPort.B); rightm = new
-		 * EV3LargeRegulatedMotor(MotorPort.C); hit = new
-		 * EV3MediumRegulatedMotor(MotorPort.A); hit.setSpeed((int)
-		 * hit.getMaxSpeed()); leftm.setSpeed((int) leftm.getMaxSpeed());
-		 * rightm.setSpeed((int) leftm.getMaxSpeed()); leftm.synchronizeWith(new
-		 * RegulatedMotor[] { rightm });
-		 */
 		this.motors = motors;
 
 	}
-
+	/**
+	* Thread loops in this method as long as done is not true.
+	*
+	*/
 	public void run() {
 		System.out.println("cmdmotors run");
 
 			try {
 				cmd = stor.getCmd();
 				while (cmd > -1 && !done) {
-					// synchronized (this) {
-					// while (cmd==1){
-					// backward();
-					// cmd = stor.getCmd();
-					// }
-					// while (cmd ==2){
-					// forward();
-					// cmd = stor.getCmd();
-					// }
-					// while(cmd==3){
-					// stopp();
-					// cmd = stor.getCmd();
-					// }
+
 					switch (cmd) {
 					case 1:
-//						while (cmd == 1) {
 							motors.backward(stor.getDist());
-//							cmd = stor.getCmd();
-//						}
 						break;
 					case 2:
-//						while (cmd == 2) {
 							motors.forward(stor.getDist());
-//							cmd = stor.getCmd();
-
-//						}
 						break;
 					case 3:
 
 							motors.stop();
-
 						break;
 
 					case 4:
@@ -84,27 +73,20 @@ public class CmdMotors extends Thread {
 
 	}
 
+	/**
+	* Rotates the motor that controls the hit mechanism.
+	*
+	*/
 	public void hit() {
 		hit.rotate(35);
 		hit.rotate(-35);
 	}
 
-	/*
-	 * public void forward() { System.out.println("etee");
-	 * leftm.startSynchronization(); leftm.forward(); rightm.forward();
-	 * leftm.endSynchronization(); try { Delay.msDelay((int)(stor.getDist()));
-	 * stopp(); } catch (InterruptedException e) { // TODO Auto-generated catch
-	 * block e.printStackTrace(); } }
-	 */
 
-	/*
-	 * public void backward() { System.out.println("taa");
-	 * leftm.startSynchronization(); leftm.backward(); rightm.backward();
-	 * leftm.endSynchronization(); try { Delay.msDelay((int)(stor.getDist()));
-	 * stopp(); } catch (InterruptedException e) { // TODO Auto-generated catch
-	 * block e.printStackTrace(); } }
-	 */
-
+	/**
+	* Stops the motors.
+	*
+	*/
 	public void stopp() {
 		leftm.startSynchronization();
 		leftm.stop();
@@ -112,7 +94,10 @@ public class CmdMotors extends Thread {
 		leftm.endSynchronization();
 
 	}
-
+	/**
+	* Terminates the thread.
+	*
+	*/
 	public void terminate() {
 		done = true;
 	}
