@@ -1,5 +1,10 @@
 package pingiskhan;
 
+/**
+ * Stores commands and distances and prevents multiple threads accessing them at the same time.
+ * @author eetz1,m2ko,willy
+ *@version 1.0
+ */
 public class Storage {
 	/**
 	 * Command and Dist stores the command as in which direction to go and distance to see how far the ball is.
